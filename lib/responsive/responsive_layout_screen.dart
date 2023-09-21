@@ -1,24 +1,42 @@
-import 'package:clone_again/utils/dimensions.dart';
+import 'package:clone_again/provider/user_provider.dart';
+import 'package:clone_again/utils/global_variable.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class ResponsiveLayout extends StatelessWidget {
-  final Widget webScreenLayout;
+class ResponsiveLayout extends StatefulWidget {
   final Widget mobileScreenLayout;
-  const ResponsiveLayout(
-      {Key? key,
-      required this.mobileScreenLayout,
-      required this.webScreenLayout})
-      : super(key: key);
+  final Widget webScreenLayout;
+  const ResponsiveLayout({
+    Key? key,
+    required this.mobileScreenLayout,
+    required this.webScreenLayout,
+  }) : super(key: key);
+
+  @override
+  State<ResponsiveLayout> createState() => _ResponsiveLayoutState();
+}
+
+class _ResponsiveLayoutState extends State<ResponsiveLayout> {
+  @override
+  void initState() {
+    super.initState();
+    addData();
+  }
+
+  addData() async {
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await userProvider.refreshUser();
+  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       if (constraints.maxWidth > webScreenSize) {
-        // web screen
-        return webScreenLayout;
+        // 600 can be changed to 900 if you want to display tablet screen with mobile screen layout
+        return widget.webScreenLayout;
       }
-      // mobie screen
-      return mobileScreenLayout;
+      return widget.mobileScreenLayout;
     });
   }
 }

@@ -1,9 +1,11 @@
+import 'package:clone_again/resources/auth_methods.dart';
 import 'package:clone_again/responsive/mobile_screen_layout.dart';
 import 'package:clone_again/responsive/responsive_layout_screen.dart';
 import 'package:clone_again/responsive/web_creen_layout.dart';
 import 'package:clone_again/screen/login_screen.dart';
 import 'package:clone_again/screen/signup_screen.dart';
 import 'package:clone_again/utils/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +43,29 @@ class MyApp extends StatelessWidget {
       //  mobileScreenLayout: MobileScreenLayout(),
       //  webScreenLayout: WebScreenLayout(),
       //),
-      home: LoginScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            return ResponsiveLayout(
+              mobileScreenLayout: MobileScreenLayout(),
+              webScreenLayout: WebScreenLayout(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('${snapshot.error}'),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: primaryColor,
+              ),
+            );
+          }
+          return const LoginScreen();
+        },
+      ),
     );
   }
 }

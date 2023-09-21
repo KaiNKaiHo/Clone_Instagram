@@ -1,5 +1,8 @@
 import 'dart:typed_data';
 import 'package:clone_again/resources/auth_methods.dart';
+import 'package:clone_again/responsive/mobile_screen_layout.dart';
+import 'package:clone_again/responsive/responsive_layout_screen.dart';
+import 'package:clone_again/responsive/web_creen_layout.dart';
 import 'package:clone_again/utils/colors.dart';
 import 'package:clone_again/utils/utils.dart';
 import 'package:clone_again/widgets/text_field_input.dart';
@@ -36,17 +39,38 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() {
       _isLoading = true;
     });
+
+    // signup user using our authmethodds
     String res = await AuthMethods().signUpUser(
         email: _emailController.text,
         password: _passwordController.text,
         username: _usernameController.text,
         bio: _bioController.text,
         file: _image!);
+    // if string returned is sucess, user has been created
     if (res == "success") {
       setState(() {
         _isLoading = false;
       });
-      showSnackBar(res, context);
+      // navigate to the home screen
+      if (context.mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const ResponsiveLayout(
+              mobileScreenLayout: MobileScreenLayout(),
+              webScreenLayout: WebScreenLayout(),
+            ),
+          ),
+        );
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      // show the error
+      if (context.mounted) {
+        showSnackBar(context, res);
+      }
     }
   }
 
@@ -55,6 +79,14 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() {
       _image = im;
     });
+  }
+
+  void navigateToSignup() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SignupScreen(),
+      ),
+    );
   }
 
   @override
@@ -172,10 +204,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: selectImage,
+                    onTap: navigateToSignup,
                     child: Container(
                       child: const Text(
-                        "Sign up",
+                        "Login",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       padding: const EdgeInsets.symmetric(

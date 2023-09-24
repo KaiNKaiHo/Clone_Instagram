@@ -3,6 +3,7 @@ import 'package:clone_again/resources/auth_methods.dart';
 import 'package:clone_again/responsive/mobile_screen_layout.dart';
 import 'package:clone_again/responsive/responsive_layout_screen.dart';
 import 'package:clone_again/responsive/web_creen_layout.dart';
+import 'package:clone_again/screen/login_screen.dart';
 import 'package:clone_again/utils/colors.dart';
 import 'package:clone_again/utils/utils.dart';
 import 'package:clone_again/widgets/text_field_input.dart';
@@ -11,23 +12,22 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
-  Uint8List? _image;
   bool _isLoading = false;
+  Uint8List? _image;
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -74,71 +74,66 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  void selectImage() async {
+  selectImage() async {
     Uint8List im = await pickImage(ImageSource.gallery);
+    // set state because we need to display the image we selected on the circle avatar
     setState(() {
       _image = im;
     });
   }
 
-  void navigateToSignup() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const SignupScreen(),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(
-                height: 100,
+              Flexible(
+                flex: 2,
+                child: Container(),
               ),
               SvgPicture.asset(
                 'assets/ic_instagram.svg',
-                // ignore: deprecated_member_use
                 color: primaryColor,
                 height: 64,
               ),
               const SizedBox(
-                height: 20,
+                height: 64,
               ),
               Stack(
                 children: [
                   _image != null
                       ? CircleAvatar(
-                          radius: 50,
+                          radius: 64,
                           backgroundImage: MemoryImage(_image!),
+                          backgroundColor: Colors.red,
                         )
                       : const CircleAvatar(
-                          radius: 50,
+                          radius: 64,
                           backgroundImage: AssetImage(
                               'assets/Default-Profile-Picture-Transparent-Image.png'),
+                          backgroundColor: Colors.red,
                         ),
                   Positioned(
-                    bottom: -15,
-                    left: 65,
+                    bottom: -10,
+                    left: 80,
                     child: IconButton(
                       onPressed: selectImage,
                       icon: const Icon(Icons.add_a_photo),
                     ),
-                  ),
+                  )
                 ],
               ),
               const SizedBox(
-                height: 20,
+                height: 24,
               ),
               TextFieldInput(
-                hintText: "Enter your Username",
+                hintText: 'Enter your username',
                 textInputType: TextInputType.text,
                 textEditingController: _usernameController,
               ),
@@ -146,7 +141,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: 24,
               ),
               TextFieldInput(
-                hintText: "Enter your Email",
+                hintText: 'Enter your email',
                 textInputType: TextInputType.emailAddress,
                 textEditingController: _emailController,
               ),
@@ -154,7 +149,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: 24,
               ),
               TextFieldInput(
-                hintText: "Enter your Password",
+                hintText: 'Enter your password',
                 textInputType: TextInputType.text,
                 textEditingController: _passwordController,
                 isPass: true,
@@ -163,55 +158,63 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: 24,
               ),
               TextFieldInput(
-                hintText: "Enter your Bio",
+                hintText: 'Enter your bio',
                 textInputType: TextInputType.text,
                 textEditingController: _bioController,
               ),
               const SizedBox(
-                height: 64,
+                height: 24,
               ),
               InkWell(
                 onTap: signUpUser,
-                child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
+                child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: const ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                    color: blueColor,
+                  ),
+                  child: !_isLoading
+                      ? const Text(
+                          'Sign up',
+                        )
+                      : const CircularProgressIndicator(
                           color: primaryColor,
                         ),
-                      )
-                    : Container(
-                        child: const Text("Login"),
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: const ShapeDecoration(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(4)),
-                          ),
-                          color: blueColor,
-                        ),
-                      ),
+                ),
               ),
               const SizedBox(
                 height: 12,
+              ),
+              Flexible(
+                flex: 2,
+                child: Container(),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    child: const Text("Don't have a account"),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: const Text(
+                      'Already have an account?',
                     ),
                   ),
                   GestureDetector(
-                    onTap: navigateToSignup,
-                    child: Container(
-                      child: const Text(
-                        "Login",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: const Text(
+                        ' Login.',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
